@@ -102,7 +102,7 @@ with gr.Blocks() as demo:
         
         sections = {
             "Your Job Skills and Similar Job Profiles": (gr.Markdown(), gr.Markdown()),
-            "Industry Insight": gr.Markdown(),
+            "Career Plan Summary": gr.Markdown(),
             "Potential Jobs to Consider": gr.Markdown(),
             "Networking Recommendations": gr.Markdown()
         }
