@@ -1,4 +1,5 @@
 import openai
+import gradio as gr
 
 
 def summarize_resume(experience):
@@ -26,7 +27,7 @@ def industry_insight(experience, goal):
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=messages,
-        temperature=0
+        temperature=0.5
     )
     return response['choices'][0]['message']['content'].strip()
 
@@ -40,6 +41,9 @@ def job_recommendations(experience, goal):
         - a score (a score of evaluating the matching level at a salce of 10)
         - Reason(explain the reasoning of the score, lay out strength and weakness)
         - skills the candidate need to improve on
+        - the companies the candidate can work for, include company information below:
+            - Company Name: the name of the company.
+            - Relevance: explain why this company is recommended
         - resources they can use (organize it as a nice table):
             - Information to get: Twitter account, Newsletter or website, please provide actual links when available. 
             - What are the training courses or certifications can be recommended, provide actual links when available."""}
@@ -48,22 +52,6 @@ def job_recommendations(experience, goal):
         model="gpt-3.5-turbo",
         messages=messages,
         temperature=0.5
-    )
-    return response['choices'][0]['message']['content'].strip()
-
-def company_recommendations(experience, goal):
-    messages=[
-        {"role": "system", "content": f"""You are a career coach. I want you start providing advice for user with this past work experience: {experience} and career goal: {goal}. 
-        Please make another table using the same list of job titles, add the companies the candidate can work for, include company information below:
-            - Company Name: the name of the company.
-            - Location: the location of the company.
-            - Industry: the industry the company belongs to.
-            - Relevance: explain why this company is recommended."""}
-    ]
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=messages,
-        temperature=0
     )
     return response['choices'][0]['message']['content'].strip()
 
@@ -81,8 +69,6 @@ def networking_connections(experience, goal):
 
 
 
-import gradio as gr
-
 with gr.Blocks() as demo:
     gr.Markdown("# CareerCraft")
     with gr.Column():
@@ -93,21 +79,19 @@ with gr.Blocks() as demo:
         with gr.Row(scale=1):
             gr.Markdown("## Your Job Skills and Industry Insights")
         with gr.Row(scale=1):
-            skills = gr.Markdown(label="Skills", lines=10)
-            industry = gr.Markdown(label="Industry Insights", lines=10)
+            skills = gr.Markdown()
+            industry = gr.Markdown()
         with gr.Row(scale=1):
             gr.Markdown("## Potential Jobs to Consider")
         with gr.Row(scale=1):
-            jobs = gr.Markdown(label="Job Recommendations", lines=10)
+            jobs = gr.Markdown()
         with gr.Row(scale=1):
-            gr.Markdown("## Company and Networking Recommendations")
+            gr.Markdown("## Networking Recommendations")
         with gr.Row(scale=1):
-            companies = gr.Markdown(label="Company Recommendations", lines=10)
-            connections = gr.Markdown(label="Networking Connections", lines=10)
+            connections = gr.Markdown()
         btn.click(fn=summarize_resume, inputs=resume, outputs=skills)
         btn.click(fn=industry_insight, inputs=[resume, goal], outputs=industry)
         btn.click(fn=job_recommendations, inputs=[resume, goal], outputs=jobs)
-        btn.click(fn=company_recommendations, inputs=[resume, goal], outputs=companies)
         btn.click(fn=networking_connections, inputs=[resume, goal], outputs=connections)
 
 demo.launch()
