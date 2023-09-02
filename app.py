@@ -4,7 +4,28 @@ import gradio as gr
 
 def summarize_resume(experience):
     messages=[
-        {"role": "system", "content": f"Extract the hard skills and soft skills from {experience} Please organize it in bullet points in markdown. Also give me three typical profiles of people who have similar experience with this job candidate, but are 10 years ahead of the user in the career, in a more senior position. Organize it in a table with job title, company, descriptions, and skills required. Give the table a title"}
+        {"role": "system", "content": f"""Extract the hard skills and soft skills from {experience}
+          Please organize it in bullet points, with subtitles in markdown."""}
+    ]
+
+  # Generate response
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=messages,
+        temperature=0,
+        # stream=True
+        # Add additional parameters here, such as prompt_id, file, or codify
+  )
+
+  # Return response
+    return response['choices'][0]['message']['content'].strip()
+
+def career_profiles(experience):
+    messages=[
+        {"role": "system", "content": f"""Extract the hard skills and soft skills from {experience}. 
+         Give me three typical profiles of people who have similar experience with this candidate, 
+         but are 5- 10 years ahead of the user in the career, in a more senior position. 
+         Organize it in a table with job title, company, descriptions, and skills required."""}
     ]
     # Generate response
   # Generate response
@@ -21,8 +42,10 @@ def summarize_resume(experience):
 
 def industry_insight(experience, goal):
     messages=[
-        {"role": "system", "content": f"""You are a career coach. I want you start providing advice for user with this past work experience: {experience} and career goal: {goal}. 
-        Please provide an overview of the industry insight, the job market for the recommended jobs. (keep it around 500 words)"""}
+        {"role": "system", "content": f"""You are a career coach. 
+         I want you start providing advice for user with this past work experience: {experience} and career goal: {goal}. 
+        Give a career plan, analyze the strengths and weakness, as well as the industry or job position insights. 
+        keep it around 200 words"""}
     ]
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -33,9 +56,9 @@ def industry_insight(experience, goal):
 
 def job_recommendations(experience, goal):
     messages=[
-        {"role": "system", "content": f"""You are a career coach. I want you start providing advice for user with this past work experience: {experience} and career goal: {goal}. 
-         Try to be creative and think outside of the box.
-        Please provide a table with the following columns: 
+        {"role": "system", "content": f"""You are a career coach.
+        I want you start providing advice for user with this past work experience: {experience} and career goal: {goal}. 
+         Try to be creative and think outside of the box. Please provide a table with the following columns: 
         - potential job titles that align with the candidate career goal
         - a brief job descriptions
         - a score (a score of evaluating the matching level at a salce of 10)
@@ -57,8 +80,10 @@ def job_recommendations(experience, goal):
 
 def networking_connections(experience, goal):
     messages=[
-        {"role": "system", "content": f"""You are a career coach. I want you start providing advice for user with this past work experience: {experience} and career goal: {goal}. 
-        Please recommend three people with similar career paths that the user could connect with to potentially get her to her career goals. List their names, job titles, past positions, companie."""}
+        {"role": "system", "content": f"""You are a career coach. 
+         I want you start providing advice for user with this past work experience: {experience} and career goal: {goal}. 
+         Please suggest three people with similar career paths that the user could connect with to potentially get to their career goals.
+         List their names, job titles, past positions, companies, and try to explain each career move."""}
     ]
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -77,9 +102,12 @@ with gr.Blocks() as demo:
             goal = gr.Textbox(label='Career Goal', placeholder="What is your career goal? Tell me about your ideal job title, industry, or salary expectation", lines=2)
         btn = gr.Button("Analyze my career path!")
         with gr.Row(scale=1):
-            gr.Markdown("## Your Job Skills and Industry Insights")
+            gr.Markdown("## Your Job Skills and similar Job Profiles")
         with gr.Row(scale=1):
             skills = gr.Markdown()
+            profiles = gr.Markdown()
+        with gr.Row(scale=1):
+            gr.Markdown("## Industry Insight")
             industry = gr.Markdown()
         with gr.Row(scale=1):
             gr.Markdown("## Potential Jobs to Consider")
@@ -90,6 +118,7 @@ with gr.Blocks() as demo:
         with gr.Row(scale=1):
             connections = gr.Markdown()
         btn.click(fn=summarize_resume, inputs=resume, outputs=skills)
+        btn.click(fn=summarize_resume, inputs=resume, outputs=profiles)
         btn.click(fn=industry_insight, inputs=[resume, goal], outputs=industry)
         btn.click(fn=job_recommendations, inputs=[resume, goal], outputs=jobs)
         btn.click(fn=networking_connections, inputs=[resume, goal], outputs=connections)
