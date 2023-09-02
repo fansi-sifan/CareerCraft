@@ -46,7 +46,7 @@ def industry_insight(experience, goal):
         {"role": "system", "content": f"""You are a career coach. 
         I want you start providing advice for user with this past work experience: {experience} and career goal: {goal}. 
         Give a career plan, analyze the strengths and weakness, as well as the industry or job position insights. 
-        keep it around 200 words"""}
+        keep it around 200 words, and organize it in markdown."""}
     ]
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -59,16 +59,14 @@ def job_recommendations(experience, goal):
     messages=[
         {"role": "system", "content": f"""You are a career coach.
         I want you start providing advice for user with this past work experience: {experience} and career goal: {goal}. 
-        Try to be creative and think outside of the box. Please provide a table with the following columns:
+        Recommend 5 job titles, try to be creative and think outside of the box. Please provide a table with the following columns:
         - potential job titles that align with the candidate career goal
         - a brief job descriptions
-        - a score (a score of evaluating the matching level at a salce of 10)
-        - Reason(explain the reasoning of the score, lay out strength and weakness)
+        - a score that evaluates how likely the candidate can get the job, 0-10)
         - skills the candidate need to improve on
-        - the companies the candidate can work for, include company information:
-            - Company Name: the name of the company, with links to their career page
-            - Relevance: explain why this company is recommended
-        - resources: resources on training courses, certifications, or industry opinion leaders. provide actual links when available."""}
+        - skills the candidate matches the job descri   ption
+        - potential companies, with links to their career page, and explain why this company is recommended
+        - resources: training courses, certifications, or industry opinion leaders. provide actual links when available."""}
     ]
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -81,8 +79,8 @@ def networking_connections(experience, goal):
     messages=[
         {"role": "system", "content": f"""You are a career coach. 
          I want you start providing advice for user with this past work experience: {experience} and career goal: {goal}. 
-         Please suggest three people that the user could connect with to potentially get to their career goals.
-         List their names, job titles, past positions, companies, and try to explain each career moves they had.
+         Please create three examples of people with similar job profiles that have achieved the career goal.
+         List their past positions, companies, and explain each career moves they had.
          Organize it in Markdown"""}
     ]
     response = openai.ChatCompletion.create(
@@ -121,7 +119,7 @@ with gr.Blocks() as demo:
         
         btn.click(fn=summarize_resume, inputs=resume, outputs=sections["Your Job Skills and Similar Job Profiles"][0])
         btn.click(fn=career_profiles, inputs=resume, outputs=sections["Your Job Skills and Similar Job Profiles"][1])
-        btn.click(fn=industry_insight, inputs=[resume, goal], outputs=sections["Industry Insight"])
+        btn.click(fn=industry_insight, inputs=[resume, goal], outputs=sections["Career Plan Summary"])
         btn.click(fn=job_recommendations, inputs=[resume, goal], outputs=sections["Potential Jobs to Consider"])
         btn.click(fn=networking_connections, inputs=[resume, goal], outputs=sections["Networking Recommendations"])
 
